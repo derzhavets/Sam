@@ -6,41 +6,85 @@ using UnityEngine;
 public class Movement : MonoBehaviour
 {
     Rigidbody rb;
+    AudioSource audioSource;
+
+    public ParticleSystem thrustParticle;
+    public ParticleSystem leftThrustParticles;
+    public ParticleSystem rightThrestParticles;
 
     public float boost = 100;
     public float rotationSpeed = 1;
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        audioSource = GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        ProcessBoost();
+        ProcessThrust();
         ProcessRotation();
     }
 
-    private void ProcessBoost()
+    private void ProcessThrust()
     {
         if (Input.GetKey(KeyCode.Space))
-        {
-            rb.AddRelativeForce(Vector3.up * boost * Time.deltaTime);
-        }
+            StartThrusting();
+        else
+            StopThrusting();
+    }
+
+    private void StartThrusting()
+    {
+        rb.AddRelativeForce(Vector3.up * boost * Time.deltaTime);
+
+        if (!audioSource.isPlaying)
+            audioSource.Play();
+
+        if (!thrustParticle.isPlaying)
+            thrustParticle.Play();
+    }
+
+    private void StopThrusting()
+    {
+        if (audioSource.isPlaying)
+            audioSource.Stop();
+
+        if (thrustParticle.isPlaying)
+            thrustParticle.Stop();
     }
 
     private void ProcessRotation()
     {
         if (Input.GetKey(KeyCode.LeftArrow))
-        {
-            Rotate(1);
-        }
+            RotateLeft();
         else if (Input.GetKey(KeyCode.RightArrow))
-        {
-            Rotate(-1);
-        }
+            RotateRight();
+        else
+            StopRotation();
+    }
+
+    private void RotateLeft()
+    {
+        Rotate(1);
+
+        if (!rightThrestParticles.isPlaying)
+            rightThrestParticles.Play();
+    }
+
+    private void RotateRight()
+    {
+        Rotate(-1);
+
+        if (!leftThrustParticles.isPlaying)
+            leftThrustParticles.Play();
+    }
+
+    private void StopRotation()
+    {
+        leftThrustParticles.Stop();
+        rightThrestParticles.Stop();
     }
 
     private void Rotate(int dir)
